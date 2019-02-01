@@ -69,6 +69,7 @@ import tensorflow as tf
 
 FLAGS = tf.app.flags.FLAGS
 
+# 第一个是参数名称，第二个参数是默认值，第三个是参数描述
 tf.app.flags.DEFINE_string('cityscapes_root',
                            './cityscapes',
                            'Cityscapes dataset root folder.')
