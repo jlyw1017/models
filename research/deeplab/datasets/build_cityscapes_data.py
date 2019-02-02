@@ -83,6 +83,7 @@ tf.app.flags.DEFINE_string(
 _NUM_SHARDS = 10
 
 # A map from data type to folder name that saves the data.
+# 把文件夹名字替换成image和label
 _FOLDERS_MAP = {
     'image': 'leftImg8bit',
     'label': 'gtFine',
@@ -115,9 +116,12 @@ def _get_files(data, dataset_split):
     A list of sorted file names or None when getting label for
       test set.
   """
+  # 如果是gtFine文件夹下的test就什么都不干
   if data == 'label' and dataset_split == 'test':
     return None
+  # 组合下文件名的后面，完整为aachen_000097_000019_gtFine_instanceIds，这里是_gtFine_labelTrainIds.png
   pattern = '*%s.%s' % (_POSTFIX_MAP[data], _DATA_FORMAT_MAP[data])
+  # cityscapes下的，leftImg8bit/gtFine 下的， train/val下的 所有 +_gtFine_labelTrainIds.png
   search_files = os.path.join(
       FLAGS.cityscapes_root, _FOLDERS_MAP[data], dataset_split, '*', pattern)
   filenames = glob.glob(search_files)
