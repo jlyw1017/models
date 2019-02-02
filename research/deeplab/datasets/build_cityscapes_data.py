@@ -142,12 +142,14 @@ def _convert_dataset(dataset_split):
   label_files = _get_files('label', dataset_split)
 
   num_images = len(image_files)
+  # ceil()大于等于x的最小整数，把所有数据分成10份
   num_per_shard = int(math.ceil(num_images / float(_NUM_SHARDS)))
 
   image_reader = build_data.ImageReader('png', channels=3)
   label_reader = build_data.ImageReader('png', channels=1)
 
   for shard_id in range(_NUM_SHARDS):
+    # train/val-pad0,5位数字-of-pad0,5位数字.tfrecord
     shard_filename = '%s-%05d-of-%05d.tfrecord' % (
         dataset_split, shard_id, _NUM_SHARDS)
     output_filename = os.path.join(FLAGS.output_dir, shard_filename)
@@ -155,6 +157,7 @@ def _convert_dataset(dataset_split):
       start_idx = shard_id * num_per_shard
       end_idx = min((shard_id + 1) * num_per_shard, num_images)
       for i in range(start_idx, end_idx):
+        # 显示转换了每个shard的几分之几
         sys.stdout.write('\r>> Converting image %d/%d shard %d' % (
             i + 1, num_images, shard_id))
         sys.stdout.flush()
@@ -164,6 +167,7 @@ def _convert_dataset(dataset_split):
         # Read the semantic segmentation annotation.
         seg_data = tf.gfile.FastGFile(label_files[i], 'rb').read()
         seg_height, seg_width = label_reader.read_image_dims(seg_data)
+        # 如果图片的高宽不等，报错
         if height != seg_height or width != seg_width:
           raise RuntimeError('Shape mismatched between image and label.')
         # Convert to tf example.
